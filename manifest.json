@@ -1,0 +1,10 @@
+{
+  "id": "obsidian-emacs-bindings",
+  "name": "Obsidian Emacs Bindings",
+  "version": "1.0.0",
+  "minAppVersion": "0.15.0",
+  "description": "Emacs bindings for Obsidian",
+  "author": "kaz8096",
+  "authorUrl": "https://github.com/kaz8096",
+  "isDesktopOnly": false
+}
