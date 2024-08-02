@@ -4,10 +4,11 @@ import {
   ViewPlugin,
   PluginValue,
   ViewUpdate,
+  keymap
 } from '@codemirror/view'
 import * as commands from '@codemirror/commands'
 import { openSearchPanel } from '@codemirror/search'
-import { ChangeDesc, EditorSelection, MapMode } from '@codemirror/state'
+import { ChangeDesc, EditorSelection, MapMode, Prec } from '@codemirror/state'
 import { startCompletion, completionStatus } from '@codemirror/autocomplete'
 
 export default class EmacsBindingsPlugin extends Plugin {
@@ -25,6 +26,8 @@ export default class EmacsBindingsPlugin extends Plugin {
 
   async onload() {
     // WSL2 has a problem with C-a
+    // delete CodeMirror.keyMap[keymap]["Cmd-L"];
+    // console.log(commands.defaultKeymap);
     this.addCommand({
       id: 'emacs-reserve',
       name: 'Reserve hotkey for emacs',
@@ -48,6 +51,13 @@ export default class EmacsBindingsPlugin extends Plugin {
         EmacsHandler.commands['yank'].exec(handler)
       },
     })
+
+    // TODO: how to deal with macos keyes.... hmm
+    // Prec.highest(
+    //   keymap.of([
+    //     { mac: "Ctrl-f", run: function(cm) { console.log('ok'); return true; } }
+    //   ])
+    // );
 
     this.registerEditorExtension(
       ViewPlugin.fromClass(
@@ -153,7 +163,7 @@ export class EmacsHandler {
       modifier += 'C-'
     }
     if (e.metaKey) {
-      modifier += 'CMD-'
+      modifier += 'M-'
     }
     if (e.altKey) {
       modifier += 'M-'
@@ -203,9 +213,11 @@ export class EmacsHandler {
   }
 
   handleKeyboard(e: KeyboardEvent) {
-    //    console.log('handleKeyboard', e);
+    // console.log('handleKeyboard', e);
     const keyData = EmacsHandler.getKey(e)
     const result = this.findCommand(keyData)
+
+    // console.log('  keyData=', keyData, ' result=', result);
 
     if (/Up|Down/.test(keyData?.[0]) && completionStatus(this.view.state))
       return
@@ -416,13 +428,13 @@ export class EmacsHandler {
       const toInsert = linesToInsert ? linesToInsert[i] : text
       i++
 
-      console.log('from:', range.from, 'to:', range.to, 'insert:', toInsert)
+      // console.log('from:', range.from, 'to:', range.to, 'insert:', toInsert)
       return {
         changes: { from: range.from, to: range.to, insert: toInsert },
         range: EditorSelection.cursor(range.from + toInsert.length),
       }
     })
-    console.log('specs', specs)
+    // console.log('specs', specs)
 
     view.dispatch(specs)
   }
@@ -611,6 +623,7 @@ EmacsHandler.addCommands({
   },
   goOrSelect: {
     exec: function (handler: EmacsHandler, args: any) {
+      // console.log('goOrSelect');
       const command = handler.emacsMark() ? args[1] : args[0]
       command(handler.view)
     },
@@ -707,6 +720,7 @@ EmacsHandler.addCommands({
   },
   setMark: {
     exec: function (handler: EmacsHandler, args: any) {
+      // console.log('setMark');
       const view = handler.view
       const ranges = view.state.selection.ranges
       // Sets mark-mode and clears current selection.
@@ -716,7 +730,6 @@ EmacsHandler.addCommands({
       // Any insertion or mouse click resets mark-mode.
       // setMark twice in a row at the same place resets markmode.
       // in multi select mode, ea selection is handled individually
-
       if (args && args.count) {
         const newMark = handler.selectionToEmacsMark()
         const mark = handler.popEmacsMark()
@@ -868,7 +881,7 @@ EmacsHandler.addCommands({
       // console.log(handler);
       // check clipboard : if it differs from the last check, add it to the kill ring
       const clipboardText = await navigator.clipboard.readText()
-      console.log('clipboard', clipboardText)
+      // console.log('clipboard', clipboardText)
       if (clipboardText != EmacsHandler.lastClipboardText) {
         EmacsHandler.lastClipboardText
         killRing.add(clipboardText)
@@ -899,6 +912,7 @@ EmacsHandler.addCommands({
   killRingSave: {
     exec: function (handler: EmacsHandler) {
       const text = handler.getCopyText()
+      // console.log('killRingSave', text);
       killRing.add(text)
       handler.clearSelection()
       navigator.clipboard.writeText(text)
