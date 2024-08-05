@@ -880,7 +880,9 @@ EmacsHandler.addCommands({
     exec: async function (handler: EmacsHandler) {
       // console.log(handler);
       // check clipboard : if it differs from the last check, add it to the kill ring
-      const clipboardText = await navigator.clipboard.readText()
+      let clipboardText = await navigator.clipboard.readText()
+      clipboardText = clipboardText.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+      clipboardText = clipboardText.replace(/[\u200B-\u200D\uFEFF]/g, '');
       if (clipboardText !== EmacsHandler.lastClipboardText) {
         EmacsHandler.lastClipboardText = clipboardText
         killRing.add(clipboardText)
@@ -948,9 +950,6 @@ EmacsHandler.addCommands({
 const killRing = {
   $data: [] as string[],
   add: function (str: string) {
-    // add it to system clipboard
-    navigator.clipboard.writeText(str)
-
     str && this.$data.push(str)
     if (this.$data.length > 30) this.$data.shift()
   },
