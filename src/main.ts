@@ -881,9 +881,8 @@ EmacsHandler.addCommands({
       // console.log(handler);
       // check clipboard : if it differs from the last check, add it to the kill ring
       const clipboardText = await navigator.clipboard.readText()
-      // console.log('clipboard', clipboardText)
-      if (clipboardText != EmacsHandler.lastClipboardText) {
-        EmacsHandler.lastClipboardText
+      if (clipboardText !== EmacsHandler.lastClipboardText) {
+        EmacsHandler.lastClipboardText = clipboardText
         killRing.add(clipboardText)
       }
       handler.onPaste(killRing.get())
@@ -915,7 +914,6 @@ EmacsHandler.addCommands({
       // console.log('killRingSave', text);
       killRing.add(text)
       handler.clearSelection()
-      navigator.clipboard.writeText(text)
     },
     readOnly: true,
   },
@@ -950,6 +948,9 @@ EmacsHandler.addCommands({
 const killRing = {
   $data: [] as string[],
   add: function (str: string) {
+    // add it to system clipboard
+    navigator.clipboard.writeText(str)
+
     str && this.$data.push(str)
     if (this.$data.length > 30) this.$data.shift()
   },
@@ -957,7 +958,11 @@ const killRing = {
     const idx = this.$data.length - 1
     let text = this.$data[idx] || ''
     if (str) text += str
-    if (text) this.$data[idx] = text
+    if (text) {
+      this.$data[idx] = text
+      // update system clipboard
+      navigator.clipboard.writeText(text)
+    }
   },
   get: function (n?: number) {
     n = n || 1
