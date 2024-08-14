@@ -569,6 +569,9 @@ export const emacsKeys: EmacsKeyBindings = {
   // todo
   // "C-x C-t" "M-t" "M-c" "F11" "C-M- "M-q"
 
+  'C-c b': 'navigateBackward',
+  'C-c f': 'navigateForward',
+
   Esc: 'unsetTransientMark',
 }
 
@@ -942,15 +945,39 @@ EmacsHandler.addCommands({
   },
   focusCommandLine: {
     exec: function (handler: EmacsHandler, arg: string) {
-    handler.showCommandLine(arg)
+      handler.showCommandLine(arg)
     }
   },
+  navigateBackward: {
+    exec: function (handler: EmacsHandler, arg: string) {
+      const app = (window as any).app;
+      if (app) {
+        app.commands.executeCommandById("app:go-back")
+      } else {
+        console.warn("App object is not available in the global scope.");
+      }
+    }
+  },
+  navigateForward: {
+    exec: function (handler: EmacsHandler, args: string) {
+      const app = (window as any).app;
+      if (app) {
+        app.commands.executeCommandById("app:go-forward")
+      } else {
+        console.warn("App object is not available in the global scope.");
+      }
+    }
+  }
 })
 
 const killRing = {
   $data: [] as string[],
   add: function (str: string) {
-    str && this.$data.push(str)
+    if (str) {
+      this.$data.push(str)
+      // update system clipboard
+      navigator.clipboard.writeText(str)
+    }
     if (this.$data.length > 30) this.$data.shift()
   },
   append: function (str: string) {
