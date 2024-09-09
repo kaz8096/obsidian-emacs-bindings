@@ -3,12 +3,11 @@ import {
   EditorView,
   ViewPlugin,
   PluginValue,
-  ViewUpdate,
-  keymap
+  ViewUpdate
 } from '@codemirror/view'
 import * as commands from '@codemirror/commands'
 import { openSearchPanel } from '@codemirror/search'
-import { ChangeDesc, EditorSelection, MapMode, Prec } from '@codemirror/state'
+import { ChangeDesc, EditorSelection, MapMode } from '@codemirror/state'
 import { startCompletion, completionStatus } from '@codemirror/autocomplete'
 
 export default class EmacsBindingsPlugin extends Plugin {
