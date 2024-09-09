@@ -71,13 +71,29 @@ If you want to enable emacs keybindings binding, you must delete your hot key as
 
 Heads-up : `C-a` and `C-y` are forcibly overwritten in this plugin.
 
-## How to use
+## How to install
+
+Run:
+
+```
+export OBSIDIAN_PLUGINS_DIR=/path/to/obsidian/vault/.obsidian/plugins
+make install
+```
+
+Or manually:
 
 ```shell
 yarn install
 yarn build
 ```
 and then copy over `main.js`, `styles.css`, `manifest.json` to your vault `VaultFolder/.obsidian/plugins/obsidian-emacs-bindings/`.
+
+## How to uninstall
+
+```
+export OBSIDIAN_PLUGINS_DIR=/path/to/obsidian/vault/.obsidian/plugins
+make uninstall
+```
 
 ## Development
 
