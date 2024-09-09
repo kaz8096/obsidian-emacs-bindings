@@ -246,6 +246,11 @@ export class EmacsHandler {
     keyChain: '',
     lastCommand: '',
   }
+  getMappedKey = (key: string, text: string) => {
+    if (key == 'Space') return 'Space'
+    if (text.length == 1) return text
+    return key
+  }
   findCommand = ([key, modifier, text]: string[]) => {
     // if keyCode == -1 a non-printable key was pressed, such as just
     // control. Handling those is currently not supported in this handler
