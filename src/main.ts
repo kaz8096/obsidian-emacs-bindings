@@ -485,11 +485,11 @@ export const emacsKeys: EmacsKeyBindings = {
     command: 'goOrSelect',
     args: [commands.cursorLineEnd, commands.selectLineEnd],
   },
-  'C-Home|S-M-,': {
+  'C-Home|S-M-,|M-<': {
     command: 'goOrSelect',
     args: [commands.cursorDocStart, commands.selectDocStart],
   },
-  'C-End|S-M-.': {
+  'C-End|S-M-.|M-S->': {
     command: 'goOrSelect',
     args: [commands.cursorDocEnd, commands.selectDocEnd],
   },
