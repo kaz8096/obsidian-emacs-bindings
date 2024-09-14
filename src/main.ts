@@ -215,6 +215,10 @@ export class EmacsHandler {
   handleKeyboard(e: KeyboardEvent) {
     // console.log('handleKeyboard', e);
     const keyData = EmacsHandler.getKey(e)
+    return this.handleKeyData(keyData)
+  }
+
+  handleKeyData(keyData: string[]) {
     const result = this.findCommand(keyData)
 
     // console.log('  keyData=', keyData, ' result=', result);
