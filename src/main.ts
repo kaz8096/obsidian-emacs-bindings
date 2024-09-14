@@ -555,7 +555,7 @@ export const emacsKeys: EmacsKeyBindings = {
   'M-u': { command: 'changeCase', args: { dir: 1 } },
   'M-l': { command: 'changeCase', args: { dir: -1 } },
   'C-x C-u': { command: 'changeCase', args: { dir: 1, region: true } },
-  'C-x C-l': { command: 'changeCase', args: { dir: 1, region: true } },
+  'C-x C-l': { command: 'changeCase', args: { dir: -1, region: true } },
   'M-/': startCompletion,
   'C-u': 'universalArgument',
 
