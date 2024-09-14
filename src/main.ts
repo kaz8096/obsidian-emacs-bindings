@@ -52,6 +52,21 @@ export default class EmacsBindingsPlugin extends Plugin {
       },
     })
 
+    this.addCommand({
+      id: 'emacs-reserve3',
+      name: 'Reserve hotkey for emacs3',
+      hotkeys: [{ modifiers: ['Ctrl'], key: 'u' }],
+      editorCallback: (editor: Editor, view: MarkdownView) => {
+        const handler = EmacsBindingsPlugin.handlerMap.get(
+          // @ts-expect-error TS2339: Property 'cm' does not exist on type 'Editor'
+          view.editor.cm as EditorView
+        )
+        if (handler !== undefined) handler.handleKeyData(
+          ['u', 'C-', 'u']
+        )
+      },
+    })
+
     // TODO: how to deal with macos keyes.... hmm
     // Prec.highest(
     //   keymap.of([
@@ -215,6 +230,10 @@ export class EmacsHandler {
   handleKeyboard(e: KeyboardEvent) {
     // console.log('handleKeyboard', e);
     const keyData = EmacsHandler.getKey(e)
+    return this.handleKeyData(keyData)
+  }
+
+  handleKeyData(keyData: string[]) {
     const result = this.findCommand(keyData)
 
     // console.log('  keyData=', keyData, ' result=', result);
