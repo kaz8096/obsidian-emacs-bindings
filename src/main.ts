@@ -246,15 +246,20 @@ export class EmacsHandler {
     keyChain: '',
     lastCommand: '',
   }
-  findCommand = ([key, modifier, text]: string[]) => {
+  getMappedKey = (key: string, text: string) => {
+    if (key == 'Space') return 'Space'
+    if (text.length == 1) return text
+    return key
+  }
+  findCommand = ([rawKey, modifier, text]: string[]) => {
     // if keyCode == -1 a non-printable key was pressed, such as just
     // control. Handling those is currently not supported in this handler
-    if (!key) return undefined
+    if (!rawKey) return undefined
 
     const data = this.$data
     // this._signal("changeStatus");
     // insertstring data.count times
-    if (!modifier && key.length == 1) {
+    if (!modifier && rawKey.length == 1) {
       this.pushEmacsMark()
       if (data.count) {
         const str = new Array(data.count + 1).join(text)
@@ -265,7 +270,7 @@ export class EmacsHandler {
 
     // CTRL + number / universalArgument for setting data.count
     if (modifier == 'C-' || data.count) {
-      const count = parseInt(key[key.length - 1])
+      const count = parseInt(rawKey[rawKey.length - 1])
       if (typeof count === 'number' && !isNaN(count)) {
         data.count = Math.max(data.count || 0, 0)
         data.count = 10 * data.count + count
@@ -273,6 +278,7 @@ export class EmacsHandler {
       }
     }
 
+    let key = this.getMappedKey(rawKey, text);
     // this.commandKeyBinding maps key specs like "c-p" (for CTRL + P) to
     // command objects, for lookup key needs to include the modifier
     if (modifier) key = modifier + key
