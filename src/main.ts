@@ -485,11 +485,11 @@ export const emacsKeys: EmacsKeyBindings = {
     command: 'goOrSelect',
     args: [commands.cursorLineEnd, commands.selectLineEnd],
   },
-  'C-Home|S-M-,': {
+  'C-Home|S-M-,|M-<': {
     command: 'goOrSelect',
     args: [commands.cursorDocStart, commands.selectDocStart],
   },
-  'C-End|S-M-.': {
+  'C-End|S-M-.|M-S->': {
     command: 'goOrSelect',
     args: [commands.cursorDocEnd, commands.selectDocEnd],
   },
@@ -561,7 +561,7 @@ export const emacsKeys: EmacsKeyBindings = {
 
   'M-;': commands.toggleComment,
 
-  'C-/|C-x u|S-C--|C-z': commands.undo,
+  'C-/|C-x u|S-C--|C-S-_|C-z': commands.undo,
   'S-C-/|S-C-x u|C--|S-C-z': commands.redo, // infinite undo?
   // vertical editing
   'C-x r': 'selectRectangularRegion',
