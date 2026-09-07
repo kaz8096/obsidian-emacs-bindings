@@ -49,6 +49,8 @@ session already provides one.
 
 The fixture uses Source mode and removes conflicting Obsidian shortcuts in
 `test/vault/.obsidian/hotkeys.json`, as described in the plugin's usage notes.
+These are insert link (`Mod-k`), search (`Mod-f`), and delete paragraph (`Mod-d`);
+on Linux, `Mod` is Control and those shortcuts would intercept the Emacs keys.
 The tests also check that ordinary Markdown editing still works with the plugin
 enabled. They are not a guarantee of compatibility with arbitrary hotkey settings,
 other plugins, IMEs, mobile devices or OS keyboard layouts. Letter-layout mapping
@@ -61,8 +63,8 @@ To test another app/installer pair without changing the defaults:
 OBSIDIAN_APP_VERSION=latest OBSIDIAN_INSTALLER_VERSION=latest yarn test:e2e
 ```
 
-On a Linux machine without a graphical desktop, install `xvfb`, `xauth` and
-`herbstluftwm`, then run:
+On a Linux machine without a graphical desktop, install `xvfb`, `xauth`,
+`herbstluftwm` and `x11-xserver-utils`, then run:
 
 ```sh
 xvfb-run -a --server-args="-screen 0 1280x1024x24" \

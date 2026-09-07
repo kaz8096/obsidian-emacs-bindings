@@ -49,12 +49,14 @@ async function withClipboard(test) {
   await browser.execute(async () => {
     const items = await navigator.clipboard.read()
     globalThis.e2eSavedClipboard = await Promise.all(
-      items.map(async (item) => {
-        const entries = await Promise.all(
-          item.types.map(async (type) => [type, await item.getType(type)])
-        )
-        return new window.ClipboardItem(Object.fromEntries(entries))
-      })
+      items
+        .filter((item) => item.types.length > 0)
+        .map(async (item) => {
+          const entries = await Promise.all(
+            item.types.map(async (type) => [type, await item.getType(type)])
+          )
+          return new window.ClipboardItem(Object.fromEntries(entries))
+        })
     )
   })
   try {
