@@ -1,5 +1,6 @@
 {
   "editor:insert-link": [],
   "editor:open-search": [],
-  "editor:delete-paragraph": []
+  "editor:delete-paragraph": [],
+  "editor:toggle-comments": []
 }

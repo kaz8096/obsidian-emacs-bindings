@@ -49,8 +49,9 @@ session already provides one.
 
 The fixture uses Source mode and removes conflicting Obsidian shortcuts in
 `test/vault/.obsidian/hotkeys.json`, as described in the plugin's usage notes.
-These are insert link (`Mod-k`), search (`Mod-f`), and delete paragraph (`Mod-d`);
-on Linux, `Mod` is Control and those shortcuts would intercept the Emacs keys.
+These are insert link (`Mod-k`), search (`Mod-f`), delete paragraph (`Mod-d`),
+and toggle comments (`Mod-/`); on Linux, `Mod` is Control and those shortcuts
+would intercept the Emacs keys.
 The tests also check that ordinary Markdown editing still works with the plugin
 enabled. They are not a guarantee of compatibility with arbitrary hotkey settings,
 other plugins, IMEs, mobile devices or OS keyboard layouts. Letter-layout mapping
