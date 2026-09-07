@@ -81,6 +81,19 @@ and then copy over `main.js`, `styles.css`, `manifest.json` to your vault `Vault
 
 ## Development
 
+Automated checks and tests require Node.js 24 and Yarn 1.22.22:
+
+```shell
+yarn install --frozen-lockfile
+yarn check
+yarn build
+yarn test:e2e
+```
+
+GitHub Actions runs static checks, unit tests, and real Obsidian operation tests
+on pull requests. See [TESTING.md](./TESTING.md) for the test environment, coverage,
+local Linux setup, and failure artifacts.
+
 ### Dev Server
 
 ```shell

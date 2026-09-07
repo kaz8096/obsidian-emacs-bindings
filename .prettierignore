@@ -3,3 +3,7 @@ node_modules/
 README.md
 
 main.js
+
+.obsidian-cache/
+artifacts/
+coverage/

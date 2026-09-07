@@ -1,12 +1,19 @@
 {
   "root": true,
   "parser": "@typescript-eslint/parser",
-  "env": { "node": true },
+  "env": { "node": true, "es2022": true },
+  "overrides": [
+    {
+      "files": ["test/**/*.mjs"],
+      "env": { "browser": true }
+    }
+  ],
   "plugins": ["@typescript-eslint"],
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/eslint-recommended",
-    "plugin:@typescript-eslint/recommended"
+    "plugin:@typescript-eslint/recommended",
+    "prettier"
   ],
   "parserOptions": {
     "sourceType": "module"

@@ -1,0 +1,11 @@
+{
+  "editor:insert-link": [],
+  "editor:toggle-bold": [],
+  "editor:toggle-italics": [],
+  "editor:toggle-underline": [],
+  "editor:open-search": [],
+  "command-palette:open": [],
+  "switcher:open": [],
+  "workspace:close": [],
+  "app:open-settings": []
+}
