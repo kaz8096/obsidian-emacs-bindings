@@ -1,6 +1,6 @@
 import { EditorView } from '@codemirror/view'
 import * as commands from '@codemirror/commands'
-import { openSearchPanel } from '@codemirror/search'
+import { openSearchPanel, findNext, findPrevious } from '@codemirror/search'
 import { ChangeDesc, EditorSelection, MapMode } from '@codemirror/state'
 import { startCompletion, completionStatus } from '@codemirror/autocomplete'
 
@@ -17,6 +17,8 @@ const specialKey: Record<string, string> = {
   Enter: 'Return',
   Divide: '/',
   Slash: '/',
+  Comma: ',',
+  Period: '.',
   Multiply: '*',
   Subtract: '-',
   Minus: '-',
@@ -62,6 +64,7 @@ export class EmacsHandler {
     // Respect remapped letters, retaining the physical key for macOS Option
     // combinations whose event.key is a symbol (for example Option-f = ƒ).
     if (/^Key[A-Z]$/.test(code) && /^[a-z]$/i.test(key)) code = key
+    if (/^Digit[0-9]$/.test(code)) code = code.slice(5)
     if (code.length > 1) {
       if (code[0] == 'N') code = code.replace(/^Numpad/, '')
       if (code[0] == 'K') code = code.replace(/^Key/, '')
@@ -164,6 +167,15 @@ export class EmacsHandler {
 
     const data = this.$data
     // this._signal("changeStatus");
+    // Read numeric arguments before treating normalized digits as typed text.
+    if (modifier == 'C-' || data.count) {
+      const count = parseInt(key[key.length - 1])
+      if (typeof count === 'number' && !isNaN(count)) {
+        data.count = Math.max(data.count || 0, 0)
+        data.count = 10 * data.count + count
+        return { command: 'null' }
+      }
+    }
     // insertstring data.count times
     if (!modifier && key.length == 1) {
       this.pushEmacsMark()
@@ -172,16 +184,6 @@ export class EmacsHandler {
         data.count = null
         data.lastCommand = null
         return { command: EmacsHandler.commands.insertstring, args: str }
-      }
-    }
-
-    // CTRL + number / universalArgument for setting data.count
-    if (modifier == 'C-' || data.count) {
-      const count = parseInt(key[key.length - 1])
-      if (typeof count === 'number' && !isNaN(count)) {
-        data.count = Math.max(data.count || 0, 0)
-        data.count = 10 * data.count + count
-        return { command: 'null' }
       }
     }
 
@@ -249,8 +251,10 @@ export class EmacsHandler {
   // mark
   $emacsMarkRing = [] as EmacsMark[]
   $emacsMark?: EmacsMark = null
+  lastYank: EditorSelection | null = null
 
   updateMarksOnChange(change: ChangeDesc) {
+    this.lastYank = null
     if (this.$emacsMark) {
       this.$emacsMark = this.updateMark(this.$emacsMark, change)
     }
@@ -349,6 +353,13 @@ export class EmacsHandler {
     // console.log('specs', specs)
 
     view.dispatch(specs)
+    return EditorSelection.create(
+      specs.selection.ranges.map((range, index) => {
+        const inserted = linesToInsert ? linesToInsert[index] : text
+        return EditorSelection.range(range.head - inserted.length, range.head)
+      }),
+      specs.selection.mainIndex
+    )
   }
   selectionToEmacsMark() {
     const selection = this.view.state.selection
@@ -429,17 +440,17 @@ export const emacsKeys: EmacsKeyBindings = {
   },
   'PageUp|M-v|C-Up': {
     command: 'goOrSelect',
-    args: [commands.cursorPageUp, commands.selectPageDown],
+    args: [commands.cursorPageUp, commands.selectPageUp],
   },
-  'S-C-Down': commands.selectPageDown,
-  'S-C-Up': commands.selectPageUp,
+  'S-C-Down|S-C-v': commands.selectPageDown,
+  'S-C-Up|S-M-v': commands.selectPageUp,
 
   'C-s': openSearchPanel, // "iSearch",
   'C-r': openSearchPanel, // "iSearchBackwards",
 
-  'M-C-s': 'findnext',
-  'M-C-r': 'findprevious',
-  'S-M-5': 'replace',
+  'M-C-s': findNext,
+  'M-C-r': findPrevious,
+  'S-M-5': openSearchPanel,
 
   // Leave unmodified editing keys to Obsidian's Markdown-aware commands.
   'C-h': commands.deleteCharBackward,
@@ -504,41 +515,47 @@ EmacsHandler.addCommands({
     },
   },
   markWord: {
-    exec: function (handler: EmacsHandler, args: any) {},
+    exec: function (handler: EmacsHandler) {
+      const view = handler.view
+      commands.selectGroupForward(view)
+      const selection = view.state.selection
+      handler.setEmacsMark(selection.ranges.map((range) => range.head))
+      view.dispatch({
+        selection: EditorSelection.create(
+          selection.ranges.map((range) =>
+            EditorSelection.range(range.head, range.anchor)
+          ),
+          selection.mainIndex
+        ),
+      })
+    },
   },
   selectParagraph: {
     exec: function (handler: EmacsHandler, args: any) {
       const view = handler.view
       const head = view.state.selection.ranges[0].head
       const doc = view.state.doc
-      const startLine = doc.lineAt(head)
-      let start = -1
-      let end = -1
-
-      let line = startLine
-      while (/\S/.test(line.text) && line.from > 0) {
-        start = line.from
-        line = view.state.doc.lineAt(line.from - 1)
+      let first = doc.lineAt(head)
+      // On a separator, select the following paragraph, including its separator.
+      let last = first
+      while (last.number < doc.lines && !/\S/.test(last.text)) {
+        last = doc.line(last.number + 1)
       }
-      if (start == -1) {
-        while (!/\S/.test(line.text) && line.to < doc.length) {
-          start = line.from
-          line = view.state.doc.lineAt(line.to + 1)
+      if (/\S/.test(first.text)) {
+        while (first.number > 1 && /\S/.test(doc.line(first.number - 1).text)) {
+          first = doc.line(first.number - 1)
         }
-      } else {
-        line = startLine
+        if (first.number > 1) first = doc.line(first.number - 1)
       }
-      while (/\S/.test(line.text) && line.to < doc.length) {
-        end = line.to
-        line = view.state.doc.lineAt(line.to + 1)
+      while (
+        last.number < doc.lines &&
+        /\S/.test(doc.line(last.number + 1).text)
+      ) {
+        last = doc.line(last.number + 1)
       }
-      if (end == -1) {
-        end = startLine.to
-      }
-      const newRanges = [EditorSelection.range(start, end)]
-      view.dispatch({
-        selection: EditorSelection.create(newRanges),
-      })
+      const end = last.number < doc.lines ? last.to + 1 : last.to
+      view.dispatch({ selection: EditorSelection.single(end, first.from) })
+      handler.setEmacsMark([end])
     },
   },
   goOrSelect: {
@@ -807,17 +824,24 @@ EmacsHandler.addCommands({
         EmacsHandler.lastClipboardText = clipboardText
         killRing.add(clipboardText)
       }
-      handler.onPaste(killRing.get())
+      handler.lastYank = handler.onPaste(killRing.get())
       handler.$data.lastCommand = 'yank'
     },
     keepLastCommand: true,
   },
   yankRotate: {
     exec: function (handler: EmacsHandler) {
-      if (handler.$data.lastCommand != 'yank') return
-      commands.undo(handler.view)
-      handler.$emacsMarkRing.pop() // also undo recording mark
-      handler.onPaste(killRing.rotate())
+      if (handler.$data.lastCommand != 'yank' || !handler.lastYank) return
+      const selection = handler.view.state.selection
+      if (
+        !handler.lastYank.ranges.every(
+          (range, i) =>
+            selection.ranges[i]?.empty && selection.ranges[i].head === range.to
+        )
+      )
+        return
+      handler.view.dispatch({ selection: handler.lastYank })
+      handler.lastYank = handler.onPaste(killRing.rotate())
       handler.$data.lastCommand = 'yank'
     },
     keepLastCommand: true,
@@ -893,6 +917,7 @@ const killRing = {
     if (str) {
       this.$data.push(str)
       // update system clipboard
+      EmacsHandler.lastClipboardText = str
       navigator.clipboard.writeText(str)
     }
     if (this.$data.length > 30) this.$data.shift()
@@ -904,6 +929,7 @@ const killRing = {
     if (text) {
       this.$data[idx] = text
       // update system clipboard
+      EmacsHandler.lastClipboardText = text
       navigator.clipboard.writeText(text)
     }
   },

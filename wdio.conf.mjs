@@ -18,7 +18,7 @@ export const config = {
         appVersion: process.env.OBSIDIAN_APP_VERSION || '1.13.7',
         installerVersion: process.env.OBSIDIAN_INSTALLER_VERSION || '1.13.7',
         plugins: ['.'],
-        vault: './test/vault',
+        vault: './test/fixtures/vault',
         copy: true,
       },
     },

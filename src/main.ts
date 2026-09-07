@@ -4,8 +4,15 @@ import {
   ViewPlugin,
   PluginValue,
   ViewUpdate,
+  keymap,
 } from '@codemirror/view'
 import { Prec } from '@codemirror/state'
+import {
+  searchKeymap,
+  findNext,
+  findPrevious,
+  closeSearchPanel,
+} from '@codemirror/search'
 import { EmacsHandler } from './emacs'
 
 export default class EmacsBindingsPlugin extends Plugin {
@@ -65,7 +72,7 @@ export default class EmacsBindingsPlugin extends Plugin {
     //   ])
     // );
 
-    this.registerEditorExtension(
+    this.registerEditorExtension([
       Prec.highest(
         ViewPlugin.fromClass(
           class implements PluginValue {
@@ -97,8 +104,15 @@ export default class EmacsBindingsPlugin extends Plugin {
             },
           }
         )
-      )
-    )
+      ),
+      // The search panel has its own keyboard scope, outside the editor content.
+      keymap.of([
+        { key: 'Ctrl-Alt-s', run: findNext, scope: 'search-panel' },
+        { key: 'Ctrl-Alt-r', run: findPrevious, scope: 'search-panel' },
+        { key: 'Ctrl-g', run: closeSearchPanel, scope: 'search-panel' },
+        ...searchKeymap,
+      ]),
+    ])
   }
 
   async onunload() {}

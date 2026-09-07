@@ -7,6 +7,11 @@ This is Emacs Key Bindings plugin for Obsidian (https://obsidian.md)
 Simple emacs keys are supported, including selection and yank.  
 These key mappings don't appear in Obsidian `HotKeys`.  
 
+`C-` means Control, `M-` means Alt (Option on macOS), and `S-` means Shift.
+These refer to the modifiers received by Obsidian after any Karabiner or other
+keyboard remapping. This plugin also recognizes Command as Meta on macOS,
+provided the corresponding Obsidian shortcut has been cleared (see below).
+
 Here's some informative table for the key bindings (not fully listed)
 
 ### Movement
@@ -19,7 +24,7 @@ Here's some informative table for the key bindings (not fully listed)
 | `M-b` | `backward-word` |
 | `M-f` | `forward-word` |
 | `C-a` | `beginning-of-line` |
-| `c-e` | `end-of-line` |
+| `C-e` | `end-of-line` |
 | `S-M-,` | `beginning-of-buffer` |
 | `S-M-.` | `end-of-buffer` |
 | `C-v` | `scroll-up-command` |
@@ -62,7 +67,7 @@ Here's some informative table for the key bindings (not fully listed)
 | `C-r` | open search panel (not `isearch-backward`) |
 | `M-C-s` | find next |
 | `M-C-r` | find previous |
-| `S-M-5` | `query-replace` |
+| `S-M-5` | `query-replace` via the search/replace panel |
 
 ## Note
 
@@ -70,6 +75,14 @@ This plugin doesn't use `HotKeys` of Obsidian. Therefore some keys might conflic
 If you want to enable emacs keybindings binding, you must delete your hot key assignment for the key combination on `HotKeys`.  
 
 Heads-up : `C-a` and `C-y` are forcibly overwritten in this plugin.
+
+For example, `C-Space`, movement, then `M-w` copies the selected region.
+If Command+w reaches Obsidian, its default **Close current tab** shortcut takes
+precedence and can replace the last open note with an empty tab. Clear that
+assignment in **Settings → Hotkeys** to use Command+w for `kill-ring-save`, or
+use the key that sends Option+w. Karabiner can make the physical key labels differ
+from these logical modifiers. The E2E fixture clears these conflicts explicitly;
+see [TESTING.md](./TESTING.md).
 
 ## How to use
 
@@ -91,8 +104,10 @@ yarn test:e2e
 ```
 
 GitHub Actions runs static checks, unit tests, and real Obsidian operation tests
-on pull requests. See [TESTING.md](./TESTING.md) for the test environment, coverage,
-local Linux setup, and failure artifacts.
+on macOS and Linux. Every Usage binding above, including aliases and Shift
+selection, has an E2E scenario; a coverage check detects missing scenarios when
+the tables change. See [TESTING.md](./TESTING.md) for the test environment,
+coverage, local setup, and failure artifacts.
 
 ### Dev Server
 

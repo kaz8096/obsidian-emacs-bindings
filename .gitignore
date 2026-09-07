@@ -24,3 +24,6 @@ data.json
 .obsidian-cache/
 artifacts/
 coverage/
+
+# Local manual test vault; automated fixtures live in test/fixtures/vault.
+test/vault/

@@ -1,0 +1,13 @@
+{
+  "editor:insert-link": [],
+  "editor:open-search": [],
+  "editor:delete-paragraph": [],
+  "editor:toggle-comments": [],
+  "workspace:close": [],
+  "markdown:toggle-preview": [],
+  "file-explorer:new-file": [],
+  "file-explorer:new-file-in-new-pane": [],
+  "editor:toggle-bold": [],
+  "command-palette:open": [],
+  "editor:save-file": []
+}

@@ -145,6 +145,14 @@ describe('Emacs editing', () => {
     expect(view.state.doc.toString()).toBe('ab\ncd')
   })
 
+  it('M-h includes the separator before the last paragraph without a trailing newline', () => {
+    setText('alpha\nbeta\n\ngamma', 14)
+    press('h', 'KeyH', { altKey: true })
+    const range = view.state.selection.main
+    expect(view.state.sliceDoc(range.from, range.to)).toBe('\ngamma')
+    expect(range.head).toBe(11)
+  })
+
   it('C-x h selects the whole document and C-w cuts the selected region', () => {
     setText('first\nsecond', 3)
     press('x', 'KeyX', { ctrlKey: true })

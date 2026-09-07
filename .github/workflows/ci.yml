@@ -55,9 +55,13 @@ jobs:
           retention-days: 7
 
   e2e:
-    name: Obsidian E2E (Linux)
+    name: Obsidian E2E (${{ matrix.os }})
     needs: checks
-    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-15]
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
@@ -73,18 +77,23 @@ jobs:
         with:
           name: plugin-build
       - name: Install virtual display and window manager
+        if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y xvfb xauth herbstluftwm x11-xserver-utils
-      - name: Run Obsidian E2E tests
+      - name: Run Obsidian E2E tests (Linux)
+        if: runner.os == 'Linux'
         run: |
           xvfb-run -a --server-args="-screen 0 1280x1024x24" \
             sh -c 'herbstluftwm & yarn test:e2e'
+      - name: Run Obsidian E2E tests (macOS)
+        if: runner.os == 'macOS'
+        run: yarn test:e2e
       - name: Upload E2E logs and failure screenshots
         if: always()
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
-          name: obsidian-e2e-results
+          name: obsidian-e2e-results-${{ matrix.os }}
           path: artifacts/e2e
           if-no-files-found: ignore
           retention-days: 7

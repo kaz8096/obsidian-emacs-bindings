@@ -5,3 +5,6 @@ main.js
 .obsidian-cache/
 artifacts/
 coverage/
+
+# Local manual test vault
+test/vault/
