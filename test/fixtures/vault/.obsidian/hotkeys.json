@@ -1,6 +1,9 @@
 {
   "editor:insert-link": [],
   "editor:open-search": [],
+  "editor:open-search-replace": [],
+  "global-search:open": [],
+  "graph:open": [],
   "editor:delete-paragraph": [],
   "editor:toggle-comments": [],
   "workspace:close": [],

@@ -77,19 +77,22 @@ The fixture uses **Source mode** and removes conflicting Obsidian shortcuts in
 notes. These settings are part of the tested configuration, not changes that the
 plugin applies automatically:
 
-| Obsidian command            | Default shortcut cleared |
-| --------------------------- | ------------------------ |
-| Insert link                 | Mod-k                    |
-| Search in current file      | Mod-f                    |
-| Delete paragraph            | Mod-d                    |
-| Toggle comment              | Mod-/                    |
-| Close current tab           | Mod-w                    |
-| Toggle reading view         | Mod-e                    |
-| Create new note             | Mod-n                    |
-| Create new note in new pane | Mod-Shift-n              |
-| Toggle bold                 | Mod-b                    |
-| Open command palette        | Mod-p                    |
-| Save current file           | Mod-s                    |
+| Obsidian command                   | Default shortcut cleared            |
+| ---------------------------------- | ----------------------------------- |
+| Insert link                        | Mod-k                               |
+| Search in current file             | Mod-f                               |
+| Search and replace in current file | Ctrl-h on Linux; Mod-Alt-f on macOS |
+| Search all files                   | Mod-Shift-f                         |
+| Open graph view                    | Mod-g                               |
+| Delete paragraph                   | Mod-d                               |
+| Toggle comment                     | Mod-/                               |
+| Close current tab                  | Mod-w                               |
+| Toggle reading view                | Mod-e                               |
+| Create new note                    | Mod-n                               |
+| Create new note in new pane        | Mod-Shift-n                         |
+| Toggle bold                        | Mod-b                               |
+| Open command palette               | Mod-p                               |
+| Save current file                  | Mod-s                               |
 
 `Mod` is Command on macOS and Control on Linux. In particular, unmodified default
 settings can let Command+w close the last note and show an empty tab before the
